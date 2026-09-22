@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", "Georgia", serif;
+
+  /* Cream / home-friendly palette */
+  --color-cream-50: #fffdf8;
+  --color-cream-100: #fdf6ea;
+  --color-cream-200: #f8ecd8;
+  --color-cream-300: #f0ddbf;
+  --color-cream-400: #e3c99e;
+
+  --color-ink-900: #362b22;
+  --color-ink-700: #56463a;
+  --color-ink-500: #7d6c5c;
+  --color-ink-400: #a1917f;
+  --color-ink-300: #c9bcac;
+
+  /* Terracotta accent (primary CTA) */
+  --color-terracotta-50: #fdf1ea;
+  --color-terracotta-100: #fbe1d0;
+  --color-terracotta-300: #eda57e;
+  --color-terracotta-400: #e5875a;
+  --color-terracotta-500: #db6b3e;
+  --color-terracotta-600: #c15630;
+  --color-terracotta-700: #9c4527;
+
+  /* Sage secondary */
+  --color-sage-50: #f2f5ee;
+  --color-sage-100: #e2ead9;
+  --color-sage-300: #b3c6a2;
+  --color-sage-400: #8fac79;
+  --color-sage-500: #71905a;
+  --color-sage-600: #587146;
+
+  /* Golden accent for AI / highlights */
+  --color-honey-300: #f3d391;
+  --color-honey-400: #ecc169;
+  --color-honey-500: #e0aa43;
+
+  --shadow-soft: 0 1px 2px rgba(54, 43, 34, 0.04), 0 8px 24px -8px rgba(54, 43, 34, 0.12);
+  --shadow-card: 0 1px 3px rgba(54, 43, 34, 0.06), 0 1px 2px rgba(54, 43, 34, 0.04);
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-cream-100 text-ink-900 font-sans antialiased;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-cream-400 rounded-full;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
