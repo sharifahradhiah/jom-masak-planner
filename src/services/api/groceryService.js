@@ -1,9 +1,5 @@
-import { request } from './client';
-import { readStore, writeStore } from '../storage';
-import { generateId } from '../../utils/id';
-
-const CHECKED_KEY = 'groceryChecked';
-const EXTRA_ITEMS_KEY = 'groceryExtraItems';
+import { supabase } from '../supabaseClient';
+import { ApiError } from './client';
 
 const CATEGORY_ORDER = [
   'Produce',
@@ -57,41 +53,56 @@ export function deriveGroceryList(plannedMeals, recipeLookup) {
   return grouped;
 }
 
-export function getCheckedState(userId) {
-  return request(() => readStore(CHECKED_KEY, {})[userId] || {}, { latency: 50 });
+export async function getCheckedState(userId) {
+  const { data, error } = await supabase
+    .from('grocery_checked')
+    .select('item_id, checked')
+    .eq('user_id', userId);
+  if (error) throw new ApiError(error.message, 'FETCH_FAILED');
+  return Object.fromEntries(data.map((row) => [row.item_id, row.checked]));
 }
 
-export function setItemChecked(userId, itemId, checked) {
-  return request(() => {
-    const all = readStore(CHECKED_KEY, {});
-    all[userId] = { ...(all[userId] || {}), [itemId]: checked };
-    writeStore(CHECKED_KEY, all);
-    return all[userId];
-  }, { latency: 40 });
+export async function setItemChecked(userId, itemId, checked) {
+  const { error } = await supabase
+    .from('grocery_checked')
+    .upsert({ user_id: userId, item_id: itemId, checked });
+  if (error) throw new ApiError(error.message, 'UPDATE_FAILED');
+  return getCheckedState(userId);
 }
 
-export function getExtraItems(userId) {
-  return request(() => readStore(EXTRA_ITEMS_KEY, {})[userId] || [], { latency: 50 });
+export async function getExtraItems(userId) {
+  const { data, error } = await supabase
+    .from('grocery_extra_items')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: true });
+  if (error) throw new ApiError(error.message, 'FETCH_FAILED');
+  return data.map((row) => ({ id: row.id, name: row.name, category: row.category, qty: row.qty }));
 }
 
-export function addExtraItem(userId, item) {
-  return request(() => {
-    const all = readStore(EXTRA_ITEMS_KEY, {});
-    const list = all[userId] || [];
-    const newItem = { id: generateId('grocery'), name: item.name, category: item.category || 'Other', qty: item.qty || '' };
-    all[userId] = [...list, newItem];
-    writeStore(EXTRA_ITEMS_KEY, all);
-    return newItem;
-  }, { latency: 80 });
+export async function addExtraItem(userId, item) {
+  const { data, error } = await supabase
+    .from('grocery_extra_items')
+    .insert({
+      user_id: userId,
+      name: item.name,
+      category: item.category || 'Other',
+      qty: item.qty || '',
+    })
+    .select()
+    .single();
+  if (error) throw new ApiError(error.message, 'CREATE_FAILED');
+  return { id: data.id, name: data.name, category: data.category, qty: data.qty };
 }
 
-export function removeExtraItem(userId, itemId) {
-  return request(() => {
-    const all = readStore(EXTRA_ITEMS_KEY, {});
-    all[userId] = (all[userId] || []).filter((i) => i.id !== itemId);
-    writeStore(EXTRA_ITEMS_KEY, all);
-    return true;
-  }, { latency: 50 });
+export async function removeExtraItem(userId, itemId) {
+  const { error } = await supabase
+    .from('grocery_extra_items')
+    .delete()
+    .eq('id', itemId)
+    .eq('user_id', userId);
+  if (error) throw new ApiError(error.message, 'DELETE_FAILED');
+  return true;
 }
 
 export { CATEGORY_ORDER };

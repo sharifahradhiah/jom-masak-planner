@@ -1,16 +1,32 @@
-# React + Vite
+# JomMasak Planner
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+JomMasak is a smart meal planning web app that helps users plan their weekly meals, discover recipes, generate grocery lists, and get AI-powered meal suggestions — making everyday cooking easier.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React + Vite, Tailwind CSS
+- [Supabase](https://supabase.com) (Postgres + Auth) for data and login
+- AI suggestions are a local heuristic (see `src/services/aiService.js`) that picks from your recipe database — not a real model call.
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Install dependencies:
+   ```
+   npm install
+   ```
+2. Create a free project at [supabase.com](https://supabase.com/dashboard).
+3. In the Supabase dashboard, open **SQL Editor** and run, in order:
+   - `supabase/schema.sql` — creates tables, RLS policies, and the profile-creation trigger.
+   - `supabase/seed.sql` — seeds the shared recipe library (generated from the old mock data; regenerate with `node scripts/generateSeedSql.mjs` if you edit `src/data/mockRecipes.js`).
+4. Copy `.env.example` to `.env.local` and fill in your project's URL and anon key (Supabase dashboard → **Project Settings → API**):
+   ```
+   cp .env.example .env.local
+   ```
+5. Run the app:
+   ```
+   npm run dev
+   ```
 
-## Expanding the Oxlint configuration
+## Deploying
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+The frontend is a static Vite build, so it deploys to any static host (Vercel, Netlify, Cloudflare Pages). Supabase is already hosted — no backend to deploy separately. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment variables on your host, matching `.env.local`.

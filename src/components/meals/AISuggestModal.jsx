@@ -21,7 +21,6 @@ export default function AISuggestModal({
   onClose,
   weekDates,
   preferences,
-  recipes,
   getRecipeById,
   onAccept,
 }) {
@@ -54,8 +53,6 @@ export default function AISuggestModal({
     return () => clearInterval(interval);
   }, [step]);
 
-  const customRecipes = useMemo(() => recipes.filter((r) => r.isCustom), [recipes]);
-
   const groupedByDay = useMemo(() => {
     const map = new Map();
     suggestions.forEach((s) => {
@@ -74,7 +71,6 @@ export default function AISuggestModal({
       dates: futureDates,
       mealTypes,
       preferences: { dietaryTags, cuisines, householdSize: preferences?.householdSize },
-      customRecipes,
     });
     setSuggestions(result.suggestions);
     setRationale(result.rationale);
@@ -88,7 +84,6 @@ export default function AISuggestModal({
         mealType: item.mealType,
         preferences: { dietaryTags, cuisines },
         currentRecipeId: item.recipeId,
-        customRecipes,
       });
       if (alternatives[0]) {
         setSuggestions((prev) =>

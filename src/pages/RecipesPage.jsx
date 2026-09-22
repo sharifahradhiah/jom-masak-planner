@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Search, Plus } from 'lucide-react';
 import { useMealPlan } from '../contexts/MealPlanContext';
 import { useToast } from '../contexts/ToastContext';
-import { DIET_TAGS } from '../data/mockRecipes';
+import { DIET_TAGS, CUSTOM_RECIPE_TAG } from '../data/mockRecipes';
 import PageContainer from '../components/layout/PageContainer';
 import PageHeader from '../components/layout/PageHeader';
 import SegmentedControl from '../components/ui/SegmentedControl';
@@ -86,7 +86,7 @@ export default function RecipesPage() {
           </div>
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {DIET_TAGS.map((tag) => (
+          {[...DIET_TAGS, CUSTOM_RECIPE_TAG].map((tag) => (
             <ChipToggle
               key={tag.id}
               label={tag.label}

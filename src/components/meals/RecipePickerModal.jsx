@@ -4,7 +4,7 @@ import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import ChipToggle from '../ui/ChipToggle';
 import Badge from '../ui/Badge';
-import { DIET_TAGS } from '../../data/mockRecipes';
+import { DIET_TAGS, CUSTOM_RECIPE_TAG, RECIPE_EMOJIS } from '../../data/mockRecipes';
 import { CATEGORY_ORDER } from '../../services/api/groceryService';
 
 const MEAL_TYPE_LABEL = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snack' };
@@ -24,6 +24,7 @@ export default function RecipePickerModal({
   const [query, setQuery] = useState('');
   const [activeTags, setActiveTags] = useState([]);
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
   const [form, setForm] = useState({
     name: '',
     emoji: '🍽️',
@@ -47,6 +48,7 @@ export default function RecipePickerModal({
     setMode('browse');
     setQuery('');
     setActiveTags([]);
+    setCreateError('');
     setForm({
       name: '',
       emoji: '🍽️',
@@ -76,6 +78,7 @@ export default function RecipePickerModal({
 
   async function handleCreate(e) {
     e.preventDefault();
+    setCreateError('');
     setCreating(true);
     try {
       const recipe = await onCreateRecipe({
@@ -93,6 +96,8 @@ export default function RecipePickerModal({
       });
       onSelectRecipe(recipe);
       resetAndClose();
+    } catch (err) {
+      setCreateError(err.message || 'Could not save this recipe. Try again.');
     } finally {
       setCreating(false);
     }
@@ -135,7 +140,7 @@ export default function RecipePickerModal({
             />
           </div>
           <div className="mb-3 flex flex-wrap gap-1.5">
-            {DIET_TAGS.map((tag) => (
+            {[...DIET_TAGS, CUSTOM_RECIPE_TAG].map((tag) => (
               <ChipToggle
                 key={tag.id}
                 label={tag.label}
@@ -181,12 +186,17 @@ export default function RecipePickerModal({
           <div className="flex gap-3">
             <div className="w-20">
               <label className="mb-1 block text-xs font-medium text-ink-600">Emoji</label>
-              <input
+              <select
                 value={form.emoji}
                 onChange={(e) => setForm((f) => ({ ...f, emoji: e.target.value }))}
-                className="w-full rounded-xl border border-cream-300 bg-cream-50 px-3 py-2 text-center text-lg outline-none focus:border-terracotta-400"
-                maxLength={2}
-              />
+                className="w-full rounded-xl border border-cream-300 bg-cream-50 px-1 py-2 text-center text-lg outline-none focus:border-terracotta-400"
+              >
+                {RECIPE_EMOJIS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.value}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="flex-1">
               <label className="mb-1 block text-xs font-medium text-ink-600">Meal name</label>
@@ -289,6 +299,8 @@ export default function RecipePickerModal({
               ))}
             </div>
           </div>
+
+          {createError && <p className="text-sm font-medium text-terracotta-600">{createError}</p>}
 
           <Button type="submit" className="w-full justify-center" loading={creating}>
             Save & add to {date}

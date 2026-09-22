@@ -14,10 +14,16 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
-  const login = useCallback(async (credentials) => {
-    const loggedInUser = await authService.login(credentials);
+  const signIn = useCallback(async (credentials) => {
+    const loggedInUser = await authService.signIn(credentials);
     setUser(loggedInUser);
     return loggedInUser;
+  }, []);
+
+  const signUp = useCallback(async (credentials) => {
+    const newUser = await authService.signUp(credentials);
+    setUser(newUser);
+    return newUser;
   }, []);
 
   const logout = useCallback(async () => {
@@ -38,8 +44,8 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   const value = useMemo(
-    () => ({ user, initializing, login, logout, finishOnboarding, savePreferences }),
-    [user, initializing, login, logout, finishOnboarding, savePreferences]
+    () => ({ user, initializing, signIn, signUp, logout, finishOnboarding, savePreferences }),
+    [user, initializing, signIn, signUp, logout, finishOnboarding, savePreferences]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,7 +1,17 @@
 import { Clock, Users, Sparkles } from 'lucide-react';
 import Badge from '../ui/Badge';
+import { DIET_TAGS, CUSTOM_RECIPE_TAG } from '../../data/mockRecipes';
+
+const TAG_LABELS = Object.fromEntries(
+  [...DIET_TAGS, CUSTOM_RECIPE_TAG].map((tag) => [tag.id, tag.label])
+);
 
 export default function RecipeCard({ recipe, onClick }) {
+  const isMyRecipe = recipe.tags.includes(CUSTOM_RECIPE_TAG.id);
+  const displayTags = isMyRecipe
+    ? [CUSTOM_RECIPE_TAG.id, ...recipe.tags.filter((t) => t !== CUSTOM_RECIPE_TAG.id)]
+    : recipe.tags;
+
   return (
     <button
       onClick={onClick}
@@ -26,9 +36,9 @@ export default function RecipeCard({ recipe, onClick }) {
         <span>{recipe.calories} kcal</span>
       </div>
       <div className="flex flex-wrap gap-1">
-        {recipe.tags.slice(0, 2).map((t) => (
-          <Badge key={t} tone="sage" className="text-[10px]">
-            {t}
+        {displayTags.slice(0, 3).map((t) => (
+          <Badge key={t} tone={t === CUSTOM_RECIPE_TAG.id ? 'honey' : 'sage'} className="text-[10px]">
+            {TAG_LABELS[t] || t}
           </Badge>
         ))}
       </div>

@@ -6,15 +6,14 @@ import {
   ShoppingBasket,
   Share2,
   ArrowRight,
-  Star,
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 
 const FEATURES = [
   {
     icon: CalendarDays,
-    title: 'Plan your week visually',
-    description: 'Drag meals onto a calendar that adapts from a mobile day-by-day view to a full desktop grid.',
+    title: 'Plan on the go or at your desk',
+    description: 'Your weekly calendar works just as well from your phone as it does on a bigger screen.',
     tone: 'terracotta',
   },
   {
@@ -25,8 +24,8 @@ const FEATURES = [
   },
   {
     icon: ShoppingBasket,
-    title: 'Groceries, auto-generated',
-    description: 'Every planned meal rolls up into one organized shopping list, grouped by aisle.',
+    title: 'One shopping list, done',
+    description: 'Every planned meal rolls up into a single organized list — no more juggling five recipes worth of ingredients in your head.',
     tone: 'sage',
   },
   {
@@ -63,11 +62,11 @@ export default function LandingPage() {
           <div>
             
             <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.1] text-ink-900 sm:text-5xl lg:text-[3.4rem]">
-              Plan your week's meals without the mental math.
+              Plan your week's meals — skip the "what's for dinner" panic.
             </h1>
             <p className="mt-4 max-w-md text-base text-ink-500 lg:text-lg">
-              From "what's for dinner" to a done grocery list — JomMasak plans, organizes, and
-              shops for your whole week in minutes.
+              JomMasak plans, organizes, and
+              preps your grocery list for the whole week.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Button as={Link} to="/login" size="lg" className="justify-center">
@@ -77,23 +76,6 @@ export default function LandingPage() {
               <Button as="a" href="#how-it-works" variant="outline" size="lg" className="justify-center">
                 See how it works
               </Button>
-            </div>
-            <div className="mt-8 flex items-center gap-3">
-              <div className="flex -space-x-2">
-                {['A', 'M', 'J', 'R'].map((l) => (
-                  <div
-                    key={l}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-cream-100 bg-sage-400 text-xs font-semibold text-white"
-                  >
-                    {l}
-                  </div>
-                ))}
-              </div>
-              <div className="flex items-center gap-1 text-sm text-ink-500">
-                <Star className="h-4 w-4 fill-honey-500 text-honey-500" />
-                <span className="font-semibold text-ink-800">4.9</span>
-                from home cooks this week
-              </div>
             </div>
           </div>
 
@@ -191,7 +173,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="border-t border-cream-300 py-6 text-center text-xs text-ink-400">
-        Built for a hackathon 🍳 — meal planning, minus the chaos.
+        meal planning, minus the chaos.
       </footer>
     </div>
   );

@@ -249,7 +249,6 @@ export default function PlannerPage() {
         onClose={() => setAiOpen(false)}
         weekDates={weekDates}
         preferences={user?.preferences}
-        recipes={recipes}
         getRecipeById={getRecipeById}
         onAccept={handleAcceptAIPlan}
       />

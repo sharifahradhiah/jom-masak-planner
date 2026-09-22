@@ -1,90 +1,129 @@
-import { request, ApiError } from './client';
-import { readStore, writeStore } from '../storage';
-import { generateId } from '../../utils/id';
+import { supabase } from '../supabaseClient';
+import { ApiError } from './client';
 
-const USERS_KEY = 'users';
-const SESSION_KEY = 'session';
-
-function getUsers() {
-  return readStore(USERS_KEY, []);
+function mapProfile(authUser, profile) {
+  return {
+    id: authUser.id,
+    email: authUser.email,
+    name: profile.name,
+    onboarded: profile.onboarded,
+    preferences: {
+      dietaryTags: profile.dietary_tags || [],
+      cuisines: profile.cuisines || [],
+      goals: profile.goals || [],
+      householdSize: profile.household_size,
+    },
+    createdAt: profile.created_at,
+  };
 }
 
-function saveUsers(users) {
-  writeStore(USERS_KEY, users);
+async function fetchProfile(authUser) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', authUser.id)
+    .single();
+  if (error) throw new ApiError(error.message, 'PROFILE_NOT_FOUND');
+  return mapProfile(authUser, data);
 }
 
-/**
- * Mock auth: "login" upserts a user record by email, no password check.
- * Swap this file's internals for real REST calls later; call sites
- * (AuthContext) never touch localStorage directly.
- */
-export function login({ email, name }) {
-  return request(() => {
-    if (!email || !email.includes('@')) {
-      throw new ApiError('Please enter a valid email address.', 'INVALID_EMAIL');
+function assertValidCredentials(email, password) {
+  if (!email || !email.includes('@')) {
+    throw new ApiError('Please enter a valid email address.', 'INVALID_EMAIL');
+  }
+  if (!password || password.length < 6) {
+    throw new ApiError('Password must be at least 6 characters.', 'INVALID_PASSWORD');
+  }
+}
+
+/** Sign in a returning user. Throws NO_ACCOUNT if there's no matching account yet. */
+export async function signIn({ email, password }) {
+  assertValidCredentials(email, password);
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    if (error.code === 'invalid_credentials') {
+      throw new ApiError('No account found for that email and password.', 'NO_ACCOUNT');
     }
-    const users = getUsers();
-    let user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
-    if (!user) {
-      user = {
-        id: generateId('user'),
-        email,
-        name: name || email.split('@')[0],
-        onboarded: false,
-        preferences: {
-          dietaryTags: [],
-          cuisines: [],
-          goals: [],
-          householdSize: 2,
-        },
-        createdAt: new Date().toISOString(),
-      };
-      users.push(user);
-      saveUsers(users);
-    }
-    writeStore(SESSION_KEY, { userId: user.id });
-    return user;
+    throw new ApiError(error.message, 'AUTH_ERROR');
+  }
+
+  return fetchProfile(data.user);
+}
+
+/** Create a brand-new account. Throws ALREADY_REGISTERED if the email is already taken. */
+export async function signUp({ name, email, password }) {
+  assertValidCredentials(email, password);
+  if (!name || !name.trim()) {
+    throw new ApiError('Please enter your name.', 'INVALID_NAME');
+  }
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { name: name.trim() } },
   });
+  if (error) throw new ApiError(error.message, 'AUTH_ERROR');
+
+  // Supabase returns a user with no identities when the email is already registered,
+  // instead of an error, to avoid leaking which emails exist.
+  if (data.user && data.user.identities && data.user.identities.length === 0) {
+    throw new ApiError('That account already exists. Check your password and try again.', 'ALREADY_REGISTERED');
+  }
+
+  return fetchProfile(data.user);
 }
 
-export function logout() {
-  return request(() => {
-    writeStore(SESSION_KEY, null);
-    return true;
-  }, { latency: 80 });
+export async function logout() {
+  const { error } = await supabase.auth.signOut();
+  if (error) throw new ApiError(error.message, 'AUTH_ERROR');
+  return true;
 }
 
-export function getCurrentUser() {
-  return request(() => {
-    const session = readStore(SESSION_KEY, null);
-    if (!session) return null;
-    const users = getUsers();
-    return users.find((u) => u.id === session.userId) || null;
-  }, { latency: 60 });
+export async function getCurrentUser() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  return fetchProfile(user);
 }
 
-export function completeOnboarding(userId, preferences) {
-  return request(() => {
-    const users = getUsers();
-    const idx = users.findIndex((u) => u.id === userId);
-    if (idx === -1) throw new ApiError('User not found.', 'NOT_FOUND');
-    users[idx] = {
-      ...users[idx],
+export async function completeOnboarding(userId, preferences) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({
       onboarded: true,
-      preferences: { ...users[idx].preferences, ...preferences },
-    };
-    saveUsers(users);
-    return users[idx];
-  });
+      dietary_tags: preferences.dietaryTags,
+      cuisines: preferences.cuisines,
+      goals: preferences.goals,
+      household_size: preferences.householdSize,
+    })
+    .eq('id', userId)
+    .select()
+    .single();
+  if (error) throw new ApiError(error.message, 'UPDATE_FAILED');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return mapProfile(user, data);
 }
 
-export function updatePreferences(userId, preferences) {
-  return request(() => {
-    const users = getUsers();
-    const idx = users.findIndex((u) => u.id === userId);
-    if (idx === -1) throw new ApiError('User not found.', 'NOT_FOUND');
-    users[idx] = { ...users[idx], preferences: { ...users[idx].preferences, ...preferences } };
-    saveUsers(users);
-    return users[idx];
-  });
+export async function updatePreferences(userId, preferences) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({
+      dietary_tags: preferences.dietaryTags,
+      cuisines: preferences.cuisines,
+      goals: preferences.goals,
+      household_size: preferences.householdSize,
+    })
+    .eq('id', userId)
+    .select()
+    .single();
+  if (error) throw new ApiError(error.message, 'UPDATE_FAILED');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return mapProfile(user, data);
 }

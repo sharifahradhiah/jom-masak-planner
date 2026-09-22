@@ -1,4 +1,5 @@
-import { RECIPES, MEAL_TYPES } from '../data/mockRecipes';
+import { MEAL_TYPES } from '../data/mockRecipes';
+import { getRecipes } from './api/recipeService';
 
 /**
  * AI service abstraction.
@@ -64,12 +65,9 @@ function buildRationale(preferences, mealTypesIncluded) {
  * @param {string[]} input.dates - ISO dates to fill
  * @param {string[]} input.mealTypes - which meal slots to generate per day
  * @param {object} input.preferences - { dietaryTags, cuisines, goals, householdSize }
- * @param {object[]} [input.excludeRecipeIds] - recipes to avoid (e.g. already planned)
  */
-export async function generateWeekPlan({ dates, mealTypes = MEAL_TYPES, preferences = {}, customRecipes = [] }) {
-  await think();
-
-  const pool = [...customRecipes, ...RECIPES];
+export async function generateWeekPlan({ dates, mealTypes = MEAL_TYPES, preferences = {} }) {
+  const [pool] = await Promise.all([getRecipes(), think()]);
   const recentlyUsed = new Set();
   const suggestions = [];
 
@@ -95,11 +93,9 @@ export async function generateWeekPlan({ dates, mealTypes = MEAL_TYPES, preferen
 }
 
 /** Suggest 3 alternative recipes for a single slot (used by the "swap" action). */
-export async function suggestSwap({ mealType, preferences = {}, currentRecipeId, customRecipes = [] }) {
-  await think();
-  const pool = [...customRecipes, ...RECIPES].filter(
-    (r) => r.mealTypes.includes(mealType) && r.id !== currentRecipeId
-  );
+export async function suggestSwap({ mealType, preferences = {}, currentRecipeId }) {
+  const [allRecipes] = await Promise.all([getRecipes(), think()]);
+  const pool = allRecipes.filter((r) => r.mealTypes.includes(mealType) && r.id !== currentRecipeId);
   const ranked = shuffle(pool).sort((a, b) => scoreRecipe(b, preferences) - scoreRecipe(a, preferences));
   return ranked.slice(0, 3);
 }

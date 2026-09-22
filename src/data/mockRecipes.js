@@ -560,6 +560,19 @@ export const DIET_TAGS = [
 
 export const CUISINES = ['Malay', 'Thai', 'Chinese', 'Indian', 'Western'];
 
+// Auto-applied to every recipe a user creates (see recipeService.createRecipe),
+// so it can be filtered on in Browse Recipes without a manual toggle.
+export const CUSTOM_RECIPE_TAG = { id: 'my-recipe', label: 'My Recipe' };
+
+export const RECIPE_EMOJIS = [
+  { value: '🍽️', label: '🍽️ General' },
+  { value: '🍳', label: '🍳 Breakfast' },
+  { value: '🍛', label: '🍛 Rice / Curry' },
+  { value: '🍜', label: '🍜 Noodles' },
+  { value: '🥗', label: '🥗 Salad / Veg' },
+  { value: '🍗', label: '🍗 Meat' },
+];
+
 export const GOALS = [
   { id: "save-time", label: "Save time on planning" },
   { id: "eat-healthier", label: "Eat healthier" },

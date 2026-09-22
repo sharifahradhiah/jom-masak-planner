@@ -3,7 +3,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import ChipToggle from '../ui/ChipToggle';
-import { DIET_TAGS, CUISINES, MEAL_TYPES } from '../../data/mockRecipes';
+import { DIET_TAGS, CUISINES, MEAL_TYPES, RECIPE_EMOJIS } from '../../data/mockRecipes';
 import { CATEGORY_ORDER } from '../../services/api/groceryService';
 
 const MEAL_TYPE_LABEL = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snack' };
@@ -23,9 +23,11 @@ const EMPTY_FORM = {
 export default function RecipeFormModal({ open, onClose, onSave }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   function reset() {
     setForm(EMPTY_FORM);
+    setError('');
   }
 
   function toggle(key, value) {
@@ -45,6 +47,7 @@ export default function RecipeFormModal({ open, onClose, onSave }) {
   async function handleSubmit(e) {
     e.preventDefault();
     if (form.mealTypes.length === 0) return;
+    setError('');
     setSaving(true);
     try {
       await onSave({
@@ -57,6 +60,8 @@ export default function RecipeFormModal({ open, onClose, onSave }) {
       });
       reset();
       onClose();
+    } catch (err) {
+      setError(err.message || 'Could not save this recipe. Try again.');
     } finally {
       setSaving(false);
     }
@@ -76,12 +81,17 @@ export default function RecipeFormModal({ open, onClose, onSave }) {
         <div className="flex gap-3">
           <div className="w-20">
             <label className="mb-1 block text-xs font-medium text-ink-600">Emoji</label>
-            <input
+            <select
               value={form.emoji}
               onChange={(e) => setForm((f) => ({ ...f, emoji: e.target.value }))}
-              className="w-full rounded-xl border border-cream-300 bg-cream-50 px-3 py-2 text-center text-lg outline-none focus:border-terracotta-400"
-              maxLength={2}
-            />
+              className="w-full rounded-xl border border-cream-300 bg-cream-50 px-1 py-2 text-center text-lg outline-none focus:border-terracotta-400"
+            >
+              {RECIPE_EMOJIS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.value}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="flex-1">
             <label className="mb-1 block text-xs font-medium text-ink-600">Meal name</label>
@@ -89,7 +99,7 @@ export default function RecipeFormModal({ open, onClose, onSave }) {
               required
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              placeholder="Mom's chicken adobo"
+              placeholder="Mom's fried chicken"
               className="w-full rounded-xl border border-cream-300 bg-cream-50 px-3 py-2 text-sm outline-none focus:border-terracotta-400"
             />
           </div>
@@ -234,6 +244,8 @@ export default function RecipeFormModal({ open, onClose, onSave }) {
             ))}
           </div>
         </div>
+
+        {error && <p className="text-sm font-medium text-terracotta-600">{error}</p>}
 
         <Button type="submit" className="w-full justify-center" loading={saving} disabled={form.mealTypes.length === 0}>
           Save recipe
