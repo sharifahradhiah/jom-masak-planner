@@ -256,12 +256,12 @@ export default function RecipePickerModal({
             </div>
             <div className="space-y-2">
               {form.ingredients.map((ing, idx) => (
-                <div key={idx} className="flex items-center gap-2">
+                <div key={idx} className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
                   <input
                     placeholder="Ingredient"
                     value={ing.name}
                     onChange={(e) => updateIngredient(idx, { name: e.target.value })}
-                    className="flex-1 rounded-lg border border-cream-300 bg-cream-50 px-2.5 py-1.5 text-sm outline-none focus:border-terracotta-400"
+                    className="w-full rounded-lg border border-cream-300 bg-cream-50 px-2.5 py-1.5 text-sm outline-none focus:border-terracotta-400 sm:w-auto sm:flex-1"
                   />
                   <input
                     type="number"
@@ -269,18 +269,18 @@ export default function RecipePickerModal({
                     placeholder="Qty"
                     value={ing.qty}
                     onChange={(e) => updateIngredient(idx, { qty: e.target.value })}
-                    className="w-16 rounded-lg border border-cream-300 bg-cream-50 px-2.5 py-1.5 text-sm outline-none focus:border-terracotta-400"
+                    className="w-16 flex-1 rounded-lg border border-cream-300 bg-cream-50 px-2.5 py-1.5 text-sm outline-none focus:border-terracotta-400 sm:flex-none"
                   />
                   <input
                     placeholder="Unit"
                     value={ing.unit}
                     onChange={(e) => updateIngredient(idx, { unit: e.target.value })}
-                    className="w-20 rounded-lg border border-cream-300 bg-cream-50 px-2.5 py-1.5 text-sm outline-none focus:border-terracotta-400"
+                    className="w-20 flex-1 rounded-lg border border-cream-300 bg-cream-50 px-2.5 py-1.5 text-sm outline-none focus:border-terracotta-400 sm:flex-none"
                   />
                   <select
                     value={ing.category}
                     onChange={(e) => updateIngredient(idx, { category: e.target.value })}
-                    className="w-32 rounded-lg border border-cream-300 bg-cream-50 px-2 py-1.5 text-xs outline-none focus:border-terracotta-400"
+                    className="w-full flex-1 rounded-lg border border-cream-300 bg-cream-50 px-2 py-1.5 text-xs outline-none focus:border-terracotta-400 sm:w-32 sm:flex-none"
                   >
                     {CATEGORY_ORDER.map((c) => (
                       <option key={c} value={c}>
@@ -291,7 +291,7 @@ export default function RecipePickerModal({
                   <button
                     type="button"
                     onClick={() => removeIngredientRow(idx)}
-                    className="rounded-lg p-1.5 text-ink-400 hover:bg-terracotta-50 hover:text-terracotta-600"
+                    className="shrink-0 rounded-lg p-1.5 text-ink-400 hover:bg-terracotta-50 hover:text-terracotta-600"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>

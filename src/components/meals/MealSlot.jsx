@@ -44,7 +44,7 @@ export default function MealSlot({ mealType, recipe, onAdd, onRemove, onSwap, co
         </p>
         {!compact && <p className="text-xs text-ink-400">{recipe.calories} kcal · {recipe.prepTime}m</p>}
       </div>
-      <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 sm:opacity-100">
+      <div className="flex shrink-0 items-center gap-0.5 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
         {onSwap && !disabled && (
           <button
             onClick={onSwap}
