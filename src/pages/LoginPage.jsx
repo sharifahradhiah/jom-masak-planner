@@ -138,7 +138,7 @@ export default function LoginPage() {
                   autoFocus
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Sharifah"
+                  placeholder="Your name"
                   className="w-full bg-transparent text-sm text-ink-900 outline-none placeholder:text-ink-300"
                 />
               </div>

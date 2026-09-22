@@ -204,7 +204,7 @@ export default function RecipePickerModal({
                 required
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                placeholder="Mom's chicken adobo"
+                placeholder="Mom's fried chicken"
                 className="w-full rounded-xl border border-cream-300 bg-cream-50 px-3 py-2 text-sm outline-none focus:border-terracotta-400"
               />
             </div>
