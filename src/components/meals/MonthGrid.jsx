@@ -10,13 +10,13 @@ export default function MonthGrid({ referenceDate, plannedMeals, onSelectDate, s
   }
 
   return (
-    <div className="rounded-2xl border border-cream-300 bg-cream-50 p-3 sm:p-4">
-      <div className="grid grid-cols-7 gap-1 pb-2 text-center text-[11px] font-semibold uppercase text-ink-400">
+    <div className="w-full min-w-0 rounded-2xl border border-cream-300 bg-cream-50 p-2 sm:p-4">
+      <div className="grid grid-cols-7 gap-0.5 pb-2 text-center text-[10px] font-semibold uppercase text-ink-400 sm:gap-1 sm:text-[11px]">
         {WEEKDAY_LABELS.map((d) => (
           <span key={d}>{d}</span>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
         {weeks.flat().map((date) => {
           const inMonth = isSameMonth(date, referenceDate);
           const count = countFor(date);
@@ -25,7 +25,7 @@ export default function MonthGrid({ referenceDate, plannedMeals, onSelectDate, s
             <button
               key={date}
               onClick={() => onSelectDate(date)}
-              className={`flex aspect-square flex-col items-center justify-center gap-0.5 rounded-xl text-sm transition-colors ${
+              className={`flex aspect-square min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl text-xs transition-colors sm:text-sm ${
                 selected
                   ? 'bg-terracotta-500 text-white'
                   : isToday(date)

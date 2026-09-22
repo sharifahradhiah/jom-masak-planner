@@ -209,19 +209,22 @@ export default function AISuggestModal({
                     return (
                       <div
                         key={`${item.date}-${item.mealType}`}
-                        className="flex items-center gap-2.5 rounded-lg bg-white px-3 py-2"
+                        className="flex items-start gap-2.5 rounded-lg bg-white px-3 py-2 sm:items-center"
                       >
-                        <span className="w-16 shrink-0 text-xs font-semibold text-ink-400">
+                        <span className="w-16 shrink-0 pt-0.5 text-xs font-semibold text-ink-400 sm:pt-0">
                           {MEAL_TYPE_LABEL[item.mealType]}
                         </span>
                         <span className="text-lg">{recipe?.emoji}</span>
-                        <span className="flex-1 truncate text-sm font-medium text-ink-800">
+                        <span
+                          className="line-clamp-2 flex-1 text-sm font-medium text-ink-800 sm:truncate"
+                          title={recipe?.name}
+                        >
                           {recipe?.name}
                         </span>
                         <button
                           onClick={() => handleSwap(index, item)}
                           disabled={swapping === index}
-                          className="rounded-lg p-1.5 text-ink-400 hover:bg-cream-200 hover:text-terracotta-600 disabled:opacity-50"
+                          className="shrink-0 rounded-lg p-1.5 text-ink-400 hover:bg-cream-200 hover:text-terracotta-600 disabled:opacity-50"
                           title="Swap suggestion"
                         >
                           <RotateCcw className={`h-3.5 w-3.5 ${swapping === index ? 'animate-spin' : ''}`} />

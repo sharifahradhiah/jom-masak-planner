@@ -39,7 +39,9 @@ export default function MealSlot({ mealType, recipe, onAdd, onRemove, onSwap, co
     <div className="group flex items-center gap-2.5 rounded-xl border border-cream-200 bg-white px-3 py-2.5 shadow-card">
       <span className="text-lg leading-none">{recipe.emoji}</span>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-ink-900">{recipe.name}</p>
+        <p className="line-clamp-2 text-sm font-semibold text-ink-900 sm:truncate" title={recipe.name}>
+          {recipe.name}
+        </p>
         {!compact && <p className="text-xs text-ink-400">{recipe.calories} kcal · {recipe.prepTime}m</p>}
       </div>
       <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 sm:opacity-100">

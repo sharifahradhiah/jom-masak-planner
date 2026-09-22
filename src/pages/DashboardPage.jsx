@@ -99,17 +99,17 @@ export default function DashboardPage() {
                 return (
                   <div
                     key={type}
-                    className="flex items-center gap-3 rounded-xl border border-cream-200 bg-cream-50 px-3.5 py-3"
+                    className="flex flex-col gap-2 rounded-xl border border-cream-200 bg-cream-50 px-3.5 py-3 sm:flex-row sm:items-center sm:gap-3"
                   >
-                    <span className="w-20 shrink-0 text-xs font-semibold uppercase tracking-wide text-ink-400">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-ink-400 sm:w-20 sm:shrink-0">
                       {MEAL_TYPE_LABEL[type]}
                     </span>
                     {recipe ? (
-                      <>
+                      <div className="flex flex-1 items-center gap-3">
                         <span className="text-xl">{recipe.emoji}</span>
                         <span className="flex-1 text-sm font-medium text-ink-800">{recipe.name}</span>
-                        <Badge tone={recipe.color}>{recipe.calories} kcal</Badge>
-                      </>
+                        {!!recipe.calories && <Badge tone={recipe.color}>{recipe.calories} kcal</Badge>}
+                      </div>
                     ) : (
                       <button
                         onClick={() => navigate(`/planner?date=${today}&meal=${type}`)}

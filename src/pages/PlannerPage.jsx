@@ -211,8 +211,8 @@ export default function PlannerPage() {
       )}
 
       {viewMode === 'monthly' && (
-        <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
-          <div>
+        <div className="grid min-w-0 gap-4 lg:grid-cols-[1fr_360px]">
+          <div className="min-w-0">
             <p className="mb-3 font-display text-base font-semibold text-ink-900">
               {formatMonthYear(selectedDate)}
             </p>
